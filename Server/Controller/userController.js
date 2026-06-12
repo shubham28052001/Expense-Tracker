@@ -1,4 +1,4 @@
-import userModel from "../Model/userModel.js";
+import userModel from "../modal/user.js";
 import {validationResult} from "express-validator";
 import {BadRequest,ServerError, Success} from "../utills/Status.js";
 import {hashPassword} from "../utills/bcrypt.js"
@@ -30,3 +30,5 @@ const registerUser=async(req,res)=>{
        return ServerError(res, "An error occurred while registering the user", error.message); 
     }
 }
+
+export default {registerUser};
