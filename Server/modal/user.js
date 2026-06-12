@@ -1,22 +1,16 @@
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
-    _id: {
-        type: String,
-        required: true,
-        unique: true
-    },
     fullName: {
-        firstName: {
-            type: String,
-            required: true
-        },
-        lastName: {
-            type: String,
-        }
+        type: String,
+        required: true
     },
     email: {
-        type: String
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
     },
     password: {
         type: String,
@@ -32,15 +26,50 @@ const userSchema = mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    loginHistory: [
+        {
+            ip: {
+                type: String
+            },
+            userAgent: {
+                type: String
+            },
+            loginAt: {
+                type: Date,
+                default: Date.now
+            },
+            status: {
+                type: String,
+                enum: ["success", "failed"],
+                default: "success"
+            }
+        },
+    ],
+    preferences: {
+        theme: {
+            type: String,
+            enum: ["light", "dark"],
+            default: "light"
+        },
+        language: {
+            type: String,
+            default: "en"
+        }
     }
 }, {
     versionKey: false,
-    _id: false
+    timestamps: true
 });
 
-const mainSchema = new mongoose.Schema({
-    user: [userSchema]
-});
 
-const User = mongoose.model("User", mainSchema);
+const User = mongoose.model("User", userSchema);
 export default User;
