@@ -45,7 +45,7 @@ MONGO_URI=your_mongodb_connection_string
 ---
 
 ## Run server
-Run server
+npm start
 
 ---
 
