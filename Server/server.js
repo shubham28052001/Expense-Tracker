@@ -2,11 +2,12 @@ import express from "express";
 import http from "http";
 import dotenv from "dotenv"
 import connectDB from "./config/db.js";
+//using dotenv to load environment variables from .env file
 dotenv.config();
 connectDB();
 const app=express();
 const PORT = process.env.PORT || 5000;
-
+//using http module to create a server and pass the express app as a callback function
 const server=http.createServer(app);
 
 app.get("/",(req,res)=>{
