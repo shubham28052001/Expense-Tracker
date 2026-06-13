@@ -64,7 +64,16 @@ const userSchema = mongoose.Schema({
             type: String,
             default: "en"
         }
-    }
+    },
+    passwordResetToken: {
+        type: String,
+        default: null
+    },
+
+    passwordResetExpires: {
+        type: Date,
+        default: null
+    },
 }, {
     versionKey: false,
     timestamps: true
