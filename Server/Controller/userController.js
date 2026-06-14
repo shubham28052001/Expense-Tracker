@@ -2,7 +2,7 @@ import userModel from "../modal/user.js";
 import { validationResult } from "express-validator";
 import { BadRequest, ServerError, Success, NotFound, Unauthorized } from "../utills/Status.js";
 import { hashPassword, comparePassword } from "../utills/bcrypt.js"
-import { generateToken, generateEmailVerificationToken, verifyEmailVerificationToken } from "../utills/jwt.js";
+import { generateToken, generateEmailVerificationToken, verifyEmailVerificationToken, generateRefreshToken, verifyRefreshToken } from "../utills/jwt.js";
 import transporter from "../config/mail.js";
 import crypto from "crypto";
 
@@ -18,7 +18,6 @@ const registerUser = async (req, res) => {
         const ExistingUser = await userModel.findOne({ email });
         if (ExistingUser) {
             return BadRequest(res, "User already exists with this email");
-          
         }
 
         //hash PAssword
@@ -47,7 +46,7 @@ const registerUser = async (req, res) => {
             The Expense Tracker Team`
         });
 
-        return Success(res, "User registered successfully", newUser);
+        return Success(res, "User registered successfully");
     } catch (error) {
         return ServerError(res, "An error occurred while registering the user", error.message);
     }
@@ -63,7 +62,7 @@ const loginUser = async (req, res) => {
         // Check if user exists
         const user = await userModel.findOne({ email });
         if (!user) {
-            return NotFound(res, "User not found with this email");
+            return Unauthorized(res, "Invalid credentials");
         }
 
         //check if password is correct
@@ -83,9 +82,33 @@ const loginUser = async (req, res) => {
             userAgent: req.headers["user-agent"],
             status: "success"
         });
+
+        if (user.loginHistory.length > 10) {
+            user.loginHistory.shift();
+        }
         const token = generateToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        user.refreshTokens.push({
+            token: refreshToken,
+            device: req.headers["user-agent"],
+            ip: req.ip
+        });
+
+        if (user.refreshTokens.length > 5) {
+            user.refreshTokens.shift();
+        }
+
+        const userResponse = {
+            id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            role: user.role,
+            isVerified: user.isVerified
+        };
+
         await user.save();
-        return Success(res, "User logged in successfully", { user, token });
+        return Success(res, "User logged in successfully", { user: userResponse, token, refreshToken });
     } catch (error) {
         return ServerError(res, "An error occurred while logging in", error.message);
     }
@@ -101,7 +124,7 @@ const verifyEmail = async (req, res) => {
         try {
             decoded = verifyEmailVerificationToken(token);
         } catch (err) {
-            if (err.name === "jwt expired") {
+            if (err.name === "TokenExpiredError") {
                 return BadRequest(res, "Verification token has expired. Please request a new verification email.");
             }
             return BadRequest(res, "Invalid verification token");
@@ -111,9 +134,10 @@ const verifyEmail = async (req, res) => {
             return NotFound(res, "User not found");
         }
         if (user.isVerified) {
-            return Success(res, "User is already verified");
+            return Success(res, "Email already verified");
         }
         user.isVerified = true;
+        user.emailVerifiedAt = new Date();
         await user.save();
 
         return Success(res, "Email verified successfully");
@@ -163,30 +187,29 @@ const forgotPassword = async (req, res) => {
             return BadRequest(res, "Validation failed", errors.array());
         }
         const user = await userModel.findOne({ email });
-        if (!user) {
-            return NotFound(res, "please provide a registered email address");
-        }
 
-        const generateResetToken = crypto.randomBytes(32).toString("hex");
-        user.passwordResetToken = crypto.createHash("sha256").update(generateResetToken).digest("hex");;
-        user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 min
+        if (user) {
+            const resetToken = crypto.randomBytes(32).toString("hex");
+            user.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");;
+            user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 min
 
-        await user.save();
+            await user.save();
+            const resetLink = `${process.env.BACKEND_URL}/api/users/reset-password?token=${resetToken}`;
 
-        const resetLink = `${process.env.BACKEND_URL}/api/users/reset-password?token=${generateResetToken}`;
-
-        await transporter.sendMail({
-            from: process.env.MAIL_USER,
-            to: user.email,
-            subject: "Password Reset Request",
-            html: `
+            await transporter.sendMail({
+                from: process.env.MAIL_USER,
+                to: user.email,
+                subject: "Password Reset Request",
+                html: `
                 <h3>Hello ${user.fullName}</h3>
                 <p>You requested a password reset</p>
                 <a href="${resetLink}">Reset Password</a>
                 <p>This link will expire in 10 minutes</p>
             `
-        });
-        return Success(res, "Password reset email sent successfully");
+            });
+        }
+
+        return Success(res, "If the email exists, a reset link has been sent");
 
     } catch (error) {
         return ServerError(res, "An error occurred while processing forgot password request", error.message);
@@ -217,9 +240,9 @@ const resetPassword = async (req, res) => {
 
         user.password = hashed;
 
-        user.passwordResetToken = undefined;
-        user.passwordResetExpires = undefined;
-
+        user.passwordResetToken = null;
+        user.passwordResetExpires = null;
+        user.refreshTokens = [];
         await user.save();
 
         return Success(res, "Password reset successfully");
@@ -233,4 +256,122 @@ const resetPassword = async (req, res) => {
     }
 };
 
-export default { registerUser, loginUser, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword };
+const refreshToken = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return BadRequest(res, "Refresh token is required");
+        }
+
+        let decoded;
+
+        try {
+            decoded = verifyRefreshToken(refreshToken);
+        } catch (err) {
+            return Unauthorized(res, "Invalid or expired refresh token");
+        }
+
+        const user = await userModel.findById(decoded.id);
+        if (!user) {
+            return NotFound(res, "User not found");
+        }
+
+        const tokenExists = user.refreshTokens.some(
+            item => item.token === refreshToken
+        );
+
+        if (!tokenExists) {
+            return Unauthorized(
+                res,
+                "Invalid or expired refresh token"
+            );
+        }
+
+        user.refreshTokens = user.refreshTokens.filter(
+            item => item.token !== refreshToken
+        );
+
+        const newAccessToken = generateToken(user);
+        const newRefreshToken = generateRefreshToken(user);
+        user.refreshTokens.push({
+            token: newRefreshToken,
+            device: req.headers["user-agent"],
+            ip: req.ip
+        });
+
+        if (user.refreshTokens.length > 5) {
+            user.refreshTokens.shift();
+        }
+
+        await user.save();
+        return Success(
+            res,
+            "Access token refreshed successfully",
+            {
+                token: newAccessToken,
+                refreshToken: newRefreshToken
+            }
+        );
+
+    } catch (error) {
+        return ServerError(
+            res,
+            "An error occurred while refreshing token",
+            error.message
+        );
+    }
+}
+
+const logout = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+
+        if (!refreshToken) {
+            return BadRequest(res, "Refresh token is required");
+        }
+        const user = await userModel.findOne({
+            "refreshTokens.token": refreshToken
+        });
+        if (!user) {
+            return Unauthorized(res, "Invalid refresh token");
+        }
+        user.refreshTokens =
+            user.refreshTokens.filter(
+                item => item.token !== refreshToken
+            );
+
+        await user.save();
+
+        return Success(
+            res,
+            "Logged out successfully"
+        );
+
+    } catch (error) {
+        return ServerError(res, "An error occurred while logging out", error.message);
+    }
+}
+
+const logoutAll = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user.id);
+        if (!user) {
+            return NotFound(res, "User not found");
+        }
+        user.refreshTokens = [];
+        await user.save();
+
+        return Success(
+            res,
+            "Logged out from all devices successfully"
+        );
+    } catch (error) {
+        return ServerError(
+            res,
+            "An error occurred while logging out from all devices",
+            error.message
+        );
+    }
+}
+
+export default { registerUser, loginUser, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, refreshToken, logout, logoutAll };

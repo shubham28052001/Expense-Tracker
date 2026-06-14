@@ -69,7 +69,21 @@ const userSchema = mongoose.Schema({
         type: String,
         default: null
     },
-
+    refreshTokens: [
+        {
+            token: String,
+            device: String,
+            ip: String,
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
+    emailVerifiedAt: {
+        type: Date,
+        default: null
+    },
     passwordResetExpires: {
         type: Date,
         default: null

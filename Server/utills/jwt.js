@@ -17,10 +17,24 @@ export const generateEmailVerificationToken = (user) => {
     return jwt.sign(
         {id: user._id},
         process.env.JWT_SECRET,
-        {expiresIn: "1m"}
+        {expiresIn: "10m"}
 )
 };
 
 export const verifyEmailVerificationToken = (token) => {
     return jwt.verify(token, process.env.JWT_SECRET);
 }
+
+export const generateRefreshToken =(user) =>{
+    return jwt.sign({
+        id: user._id,
+    },
+    process.env.JWT_REFRESH_SECRET,
+    {
+        expiresIn: process.env.JWT_REFRESH_EXPIRE_IN,
+    })
+}
+
+export const verifyRefreshToken = (token) => {
+    return jwt.verify(token,process.env.JWT_REFRESH_SECRET);
+};

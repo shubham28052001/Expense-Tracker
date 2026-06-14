@@ -32,7 +32,7 @@ export const forgotPasswordLimiter = rateLimit({
     max: 3, 
     message: {
         success: false,
-        message: "Too many password reset attempts. Try again after 15 minutes"
+        message: "Too many password reset attempts. Try again after 10 minutes"
     }
 });
 
@@ -42,5 +42,14 @@ export const resetPasswordLimiter = rateLimit({
     message: {
         success: false,
         message: "Too many attempts. Please try again later"
+    }
+});
+
+export const refreshLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 30,
+    message: {
+        success: false,
+        message: "Too many refresh requests. Please try again later."
     }
 });
