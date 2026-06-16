@@ -1,7 +1,7 @@
 import userModel from "../modal/user.js";
 import { validationResult } from "express-validator";
 import { BadRequest, ServerError, Success, NotFound, Unauthorized } from "../utills/Status.js";
-import { hashPassword, comparePassword } from "../utills/bcrypt.js"
+import { hashPassword, comparePassword, verifyGoogleToken } from "../utills/bcrypt.js"
 import { generateToken, generateEmailVerificationToken, verifyEmailVerificationToken, generateRefreshToken, verifyRefreshToken } from "../utills/jwt.js";
 import transporter from "../config/mail.js";
 import crypto from "crypto";
@@ -114,6 +114,61 @@ const loginUser = async (req, res) => {
     }
 }
 
+const googleLogin = async (req, res) => {
+    try {
+
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({
+                success: false,
+                message: "Google token is required"
+            });
+        }
+        const payload = await verifyGoogleToken(token);
+        const { email, name, sub } = payload;
+        let user = await userModel.findOne({ email });
+        if (user && user.provider === "local") {
+            return BadRequest(
+                res,
+                "This email is already registered with password login"
+            );
+        }
+        if (!user) {
+            user = await userModel.create({
+                fullName: name,
+                email,
+                provider: "google",
+                providerId: sub,
+                isVerified: true,
+                emailVerifiedAt: new Date()
+            });
+        }
+
+        const accessToken = generateToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        user.refreshTokens.push({
+            token: refreshToken,
+            device: req.headers["user-agent"],
+            ip: req.ip
+        });
+
+        await user.save();
+        return res.status(200).json({
+            success: true,
+            accessToken,
+            refreshToken,
+            user
+        });
+
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid Google token"
+        });
+    }
+}
+
 const verifyEmail = async (req, res) => {
     try {
         const { token } = req.query;
@@ -187,11 +242,16 @@ const forgotPassword = async (req, res) => {
             return BadRequest(res, "Validation failed", errors.array());
         }
         const user = await userModel.findOne({ email });
-
+        if (user && user.provider !== "local") {
+            return BadRequest(
+                res,
+                "Password reset is not available for Google accounts"
+            );
+        }
         if (user) {
             const resetToken = crypto.randomBytes(32).toString("hex");
             user.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");;
-            user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 min
+            user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
 
             await user.save();
             const resetLink = `${process.env.BACKEND_URL}/api/users/reset-password?token=${resetToken}`;
@@ -374,4 +434,4 @@ const logoutAll = async (req, res) => {
     }
 }
 
-export default { registerUser, loginUser, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, refreshToken, logout, logoutAll };
+export default { registerUser, loginUser, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, refreshToken, logout, logoutAll, googleLogin };

@@ -84,6 +84,7 @@ Base URL: `http://localhost:5000/api/users`
 |---|---|---|
 | POST | /register | Register a new user |
 | POST | /login | Login and receive access + refresh tokens |
+| POST | /google-login | Login with Google OAuth token |
 | GET | /verify-email?token=YOUR_TOKEN | Verify email address |
 | POST | /resend-verification | Send another verification email |
 | POST | /forgot-password | Request a password reset email |
@@ -112,6 +113,15 @@ curl -X POST http://localhost:5000/api/users/login \
   -d '{
     "email": "john@example.com",
     "password": "12345678"
+  }'
+```
+
+### Google Login
+```bash
+curl -X POST http://localhost:5000/api/users/google-login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "YOUR_GOOGLE_ID_TOKEN"
   }'
 ```
 

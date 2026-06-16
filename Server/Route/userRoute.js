@@ -6,6 +6,7 @@ const router=express.Router();
 
 router.post("/register",registerValidation,registerLimiter,userController.registerUser);
 router.post("/login",loginValidation,loginLimiter,userController.loginUser);
+router.post("/google-login", userController.googleLogin);
 router.get("/verify-email",userController.verifyEmail);
 router.post("/resend-verification",resendEmailLimiter,userController.resendVerificationEmail);
 router.post("/forgot-password",forgotPasswordValidation,forgotPasswordLimiter,userController.forgotPassword);

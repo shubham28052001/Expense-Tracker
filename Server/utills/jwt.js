@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library"
 //function to generate a JWT token for a user
 
 export const generateToken = (user) => {
@@ -15,26 +16,38 @@ export const generateToken = (user) => {
 
 export const generateEmailVerificationToken = (user) => {
     return jwt.sign(
-        {id: user._id},
+        { id: user._id },
         process.env.JWT_SECRET,
-        {expiresIn: "10m"}
-)
+        { expiresIn: "10m" }
+    )
 };
 
 export const verifyEmailVerificationToken = (token) => {
     return jwt.verify(token, process.env.JWT_SECRET);
 }
 
-export const generateRefreshToken =(user) =>{
+export const generateRefreshToken = (user) => {
     return jwt.sign({
         id: user._id,
     },
-    process.env.JWT_REFRESH_SECRET,
-    {
-        expiresIn: process.env.JWT_REFRESH_EXPIRE_IN,
-    })
+        process.env.JWT_REFRESH_SECRET,
+        {
+            expiresIn: process.env.JWT_REFRESH_EXPIRE_IN,
+        })
 }
 
 export const verifyRefreshToken = (token) => {
-    return jwt.verify(token,process.env.JWT_REFRESH_SECRET);
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 };
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const verifyGoogleToken = async (token) => {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    return ticket.getPayload();
+};
+
+

@@ -10,11 +10,14 @@ const userSchema = mongoose.Schema({
         required: true,
         unique: true,
         lowercase: true,
-        trim: true
+        trim: true,
+        index: true
     },
     password: {
         type: String,
-        required: true
+        required: function () {
+            return this.provider === "local";
+        }
     },
 
     role: {
@@ -82,6 +85,15 @@ const userSchema = mongoose.Schema({
     ],
     emailVerifiedAt: {
         type: Date,
+        default: null
+    },
+    provider: {
+        type: String,
+        enum: ["local", "google"],
+        default: "local"
+    },
+    providerId: {
+        type: String,
         default: null
     },
     passwordResetExpires: {
