@@ -11,7 +11,7 @@ export const resendEmailLimiter = rateLimit({
 
 export const loginLimiter = rateLimit({
     windowMs: 10 * 60 * 1000,
-    max: 3, 
+    max: 10, 
     message: {
         success: false,
         message: "Too many login attempts. Try again after 10 minutes"
@@ -29,7 +29,7 @@ export const registerLimiter = rateLimit({
 
 export const forgotPasswordLimiter = rateLimit({
     windowMs: 10 * 60 * 1000,
-    max: 3, 
+    max: 10, 
     message: {
         success: false,
         message: "Too many password reset attempts. Try again after 10 minutes"

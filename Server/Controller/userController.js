@@ -1,10 +1,11 @@
 import userModel from "../modal/user.js";
 import { validationResult } from "express-validator";
-import { BadRequest, ServerError, Success, NotFound, Unauthorized } from "../utills/Status.js";
-import { hashPassword, comparePassword, verifyGoogleToken } from "../utills/bcrypt.js"
-import { generateToken, generateEmailVerificationToken, verifyEmailVerificationToken, generateRefreshToken, verifyRefreshToken } from "../utills/jwt.js";
+import { BadRequest, ServerError, Success, NotFound, Unauthorized,Forbidden } from "../utills/Status.js";
+import { hashPassword, comparePassword } from "../utills/bcrypt.js"
+import { generateToken, generateEmailVerificationToken, verifyEmailVerificationToken, generateRefreshToken, verifyRefreshToken,verifyGoogleToken } from "../utills/jwt.js";
 import transporter from "../config/mail.js";
 import crypto from "crypto";
+import { log } from "console";
 
 const registerUser = async (req, res) => {
     try {
@@ -46,7 +47,7 @@ const registerUser = async (req, res) => {
             The Expense Tracker Team`
         });
 
-        return Success(res, "User registered successfully");
+        return Success(res, "verification email sent to your Email successfully");
     } catch (error) {
         return ServerError(res, "An error occurred while registering the user", error.message);
     }
@@ -73,7 +74,7 @@ const loginUser = async (req, res) => {
 
         //check if user is verified
         if (!user.isVerified) {
-            return Unauthorized(res, "User is not verified. Please verify your email.");
+            return Forbidden(res, "User is not verified. Please verify your email.");
         }
 
         // Add login history
@@ -237,44 +238,54 @@ const resendVerificationEmail = async (req, res) => {
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return BadRequest(res, "Validation failed", errors.array());
         }
+
         const user = await userModel.findOne({ email });
-        if (user && user.provider !== "local") {
-            return BadRequest(
-                res,
-                "Password reset is not available for Google accounts"
-            );
+
+        // Always return same response later for security
+        if (!user || user.provider !== "local") {
+            return Success(res, "If the email exists, a reset link has been sent");
         }
-        if (user) {
-            const resetToken = crypto.randomBytes(32).toString("hex");
-            user.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");;
-            user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min
 
-            await user.save();
-            const resetLink = `${process.env.BACKEND_URL}/api/users/reset-password?token=${resetToken}`;
+        // invalidate old tokens
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
 
-            await transporter.sendMail({
-                from: process.env.MAIL_USER,
-                to: user.email,
-                subject: "Password Reset Request",
-                html: `
+        const resetToken = crypto.randomBytes(32).toString("hex");
+
+        user.passwordResetToken = crypto
+            .createHash("sha256")
+            .update(resetToken)
+            .digest("hex");
+
+        user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+        await user.save();
+
+        const resetLink = `${process.env.BACKEND_URL}/reset-password?token=${resetToken}`;
+        await transporter.sendMail({
+            from: process.env.MAIL_USER,
+            to: user.email,
+            subject: "Password Reset Request",
+            html: `
                 <h3>Hello ${user.fullName}</h3>
                 <p>You requested a password reset</p>
                 <a href="${resetLink}">Reset Password</a>
                 <p>This link will expire in 10 minutes</p>
             `
-            });
-        }
+        });
 
         return Success(res, "If the email exists, a reset link has been sent");
 
     } catch (error) {
-        return ServerError(res, "An error occurred while processing forgot password request", error.message);
+        console.log(error);
+        return ServerError(res, "Error processing forgot password request", error.message);
     }
-}
+};
 
 const resetPassword = async (req, res) => {
     try {
@@ -284,10 +295,14 @@ const resetPassword = async (req, res) => {
         if (!token || !newPassword) {
             return BadRequest(res, "Missing required fields");
         }
+
+        // 1. Hash token (same as stored in DB)
         const hashedToken = crypto
             .createHash("sha256")
             .update(token)
             .digest("hex");
+
+        // 2. Find valid user
         const user = await userModel.findOne({
             passwordResetToken: hashedToken,
             passwordResetExpires: { $gt: Date.now() }
@@ -296,18 +311,25 @@ const resetPassword = async (req, res) => {
         if (!user) {
             return BadRequest(res, "Invalid or expired reset token");
         }
+
+        // 3. Hash new password
         const hashed = await hashPassword(newPassword);
 
         user.password = hashed;
 
-        user.passwordResetToken = null;
-        user.passwordResetExpires = null;
+        // 4. Clean reset fields (important security step)
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+
+        // optional but recommended
         user.refreshTokens = [];
+
         await user.save();
 
         return Success(res, "Password reset successfully");
 
     } catch (error) {
+        console.log("RESET PASSWORD ERROR:", error);
         return ServerError(
             res,
             "An error occurred while processing reset password request",

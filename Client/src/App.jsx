@@ -1,9 +1,11 @@
 import React from 'react'
-import Landing from './pages/Landing'
+import AppRoutes from './routes/AppRoutes'
+import { Toaster, toast } from "react-hot-toast";
 function App() {
   return (
     <div>
-    <Landing/>
+   <AppRoutes/>
+   <Toaster position="top-right" />
     </div>
   )
 }

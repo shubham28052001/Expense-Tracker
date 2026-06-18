@@ -4,9 +4,14 @@ import express from "express";
 import http from "http";
 import connectDB from "./config/db.js";
 import userRoute from "./Route/userRoute.js";
+import cors from "cors"
 //using dotenv to load environment variables from .env file
 connectDB();
 const app=express();
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 const PORT = process.env.PORT || 5000;
 //using http module to create a server and pass the express app as a callback function
 const server=http.createServer(app);
