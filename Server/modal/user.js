@@ -72,6 +72,10 @@ const userSchema = mongoose.Schema({
         type: String,
         default: null
     },
+    emailVerificationToken: {
+        type: String,
+        default: null
+    },
     refreshTokens: [
         {
             token: String,

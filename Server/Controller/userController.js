@@ -1,8 +1,8 @@
 import userModel from "../modal/user.js";
 import { validationResult } from "express-validator";
-import { BadRequest, ServerError, Success, NotFound, Unauthorized,Forbidden } from "../utills/Status.js";
+import { BadRequest, ServerError, Success, NotFound, Unauthorized, Forbidden } from "../utills/Status.js";
 import { hashPassword, comparePassword } from "../utills/bcrypt.js"
-import { generateToken, generateEmailVerificationToken, verifyEmailVerificationToken, generateRefreshToken, verifyRefreshToken,verifyGoogleToken } from "../utills/jwt.js";
+import { generateToken, generateEmailVerificationToken, verifyEmailVerificationToken, generateRefreshToken, verifyRefreshToken, verifyGoogleToken } from "../utills/jwt.js";
 import transporter from "../config/mail.js";
 import crypto from "crypto";
 import { log } from "console";
@@ -32,8 +32,10 @@ const registerUser = async (req, res) => {
         });
 
         const emailToken = generateEmailVerificationToken(newUser);
+        newUser.emailVerificationToken = emailToken;
+        await newUser.save();
 
-        const verificationLink = `${process.env.BACKEND_URL}/api/users/verify-email?token=${emailToken}`;
+        const verificationLink = `${process.env.BACKEND_URL}/verify-email?token=${emailToken}`;
 
         await transporter.sendMail({
             from: process.env.MAIL_USER,
@@ -64,6 +66,13 @@ const loginUser = async (req, res) => {
         const user = await userModel.findOne({ email });
         if (!user) {
             return Unauthorized(res, "Invalid credentials");
+        }
+
+        if (user.provider === "google") {
+            return BadRequest(
+                res,
+                "This account was created using Google. Please continue with Google."
+            );
         }
 
         //check if password is correct
@@ -148,11 +157,25 @@ const googleLogin = async (req, res) => {
         const accessToken = generateToken(user);
         const refreshToken = generateRefreshToken(user);
 
+        user.loginHistory.push({
+            ip: req.ip,
+            userAgent: req.headers["user-agent"],
+            status: "success"
+        });
+
+        if (user.loginHistory.length > 10) {
+            user.loginHistory.shift();
+        }
+
         user.refreshTokens.push({
             token: refreshToken,
             device: req.headers["user-agent"],
             ip: req.ip
         });
+
+        if (user.refreshTokens.length > 5) {
+            user.refreshTokens.shift();
+        }
 
         await user.save();
         return res.status(200).json({
@@ -173,34 +196,58 @@ const googleLogin = async (req, res) => {
 const verifyEmail = async (req, res) => {
     try {
         const { token } = req.query;
+
         if (!token) {
             return BadRequest(res, "Verification token is missing");
         }
+
         let decoded;
+
         try {
             decoded = verifyEmailVerificationToken(token);
         } catch (err) {
             if (err.name === "TokenExpiredError") {
-                return BadRequest(res, "Verification token has expired. Please request a new verification email.");
+                return BadRequest(
+                    res,
+                    "Verification token has expired. Please request a new verification email."
+                );
             }
+
             return BadRequest(res, "Invalid verification token");
         }
+
         const user = await userModel.findById(decoded.id);
+
         if (!user) {
             return NotFound(res, "User not found");
         }
-        if (user.isVerified) {
-            return Success(res, "Email already verified");
+
+        // One-time token validation
+        if (user.emailVerificationToken !== token) {
+            return BadRequest(
+                res,
+                "Verification link has already been used or is invalid"
+            );
         }
+
         user.isVerified = true;
         user.emailVerifiedAt = new Date();
+
+        // Invalidate token after first use
+        user.emailVerificationToken = null;
+
         await user.save();
 
         return Success(res, "Email verified successfully");
+
     } catch (error) {
-        return ServerError(res, "An error occurred while verifying email", error.message);
+        return ServerError(
+            res,
+            "An error occurred while verifying email",
+            error.message
+        );
     }
-}
+};
 
 const resendVerificationEmail = async (req, res) => {
     try {
@@ -217,7 +264,10 @@ const resendVerificationEmail = async (req, res) => {
         }
 
         const emailToken = generateEmailVerificationToken(user);
-        const verificationLink = `${process.env.BACKEND_URL}/api/users/verify-email?token=${emailToken}`;
+        user.emailVerificationToken = emailToken;
+        await user.save();
+
+        const verificationLink = `${process.env.BACKEND_URL}/verify-email?token=${emailToken}`;
 
         await transporter.sendMail({
             from: process.env.MAIL_USER,

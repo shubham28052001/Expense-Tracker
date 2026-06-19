@@ -1,19 +1,22 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { validateLogin } from "../utils/validation";
-import { loginUser } from "../services/authService"
+import { Link } from "react-router";
+import { registerUser, googleLogin } from "../../services/authService"
+import { validateRegister } from "../../utils/validation";
 import { toast } from "react-hot-toast"
-function Login() {
+import { useNavigate } from "react-router";
+import { GoogleLogin } from "@react-oauth/google";
+
+function Register() {
+  const navigate = useNavigate();
   const [user, setUser] = useState({
+    fullName: "",
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,35 +29,63 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const newErrors = validateRegister(user);
+    localStorage.setItem("verifyEmail", user.email);
 
-    const newErrors = validateLogin(user);
     if (Object.keys(newErrors).length > 0) {
       return setErrors(newErrors);
     }
 
-    setLoading(true);
-
     try {
-      const res = await loginUser(user);
-
-      const data = res.data.data;
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("refreshToken", data.refreshToken);
-
-      toast.success(res.data.message);
-
-      setUser({ email: "", password: "" });
+      setLoading(true);
+      const res = await registerUser(user);
+      console.log("Success:", res.data);
+      toast.success(res.data.message, {
+        duration: 2000
+      });
       setErrors({});
-      navigate("/dashboard");
-
+      setUser({
+        fullName: "",
+        email: "",
+        password: "",
+      });
+      setTimeout(() => {
+        navigate("/login");
+      }, 800);
     } catch (error) {
-      toast.error(
-        error?.response?.data?.message || "Server error"
-      );
+      toast.error(error.response?.data?.message);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await googleLogin(
+        credentialResponse.credential
+      );
+
+      localStorage.setItem(
+        "token",
+        res.data.accessToken
+      );
+
+      localStorage.setItem(
+        "refreshToken",
+        res.data.refreshToken
+      );
+
+      toast.success("Google Registration Successful");
+
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+        "Google registration failed"
+      );
+    }
+  };
+
   return (
     <div className=" bg-white flex flex-col lg:flex-row overflow-hidden h-screen">
 
@@ -65,11 +96,12 @@ function Login() {
           </div>
         </div>
       )}
+
       {/* Left Side */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-slate-100 p-10">
         <img
-          src="/image2.avif"
-          alt="Register"
+          src="/image1.jpg"
+          alt="Register Illustration"
           className="w-full h-full object-cover rounded-2xl shadow-2xl"
         />
       </div>
@@ -80,16 +112,24 @@ function Login() {
 
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">
-              Login Account
+              Create Account
             </h1>
             <p className="mt-2 text-gray-600">
               Join us today and start managing your work efficiently.
             </p>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-lg hover:bg-gray-50 transition focus:ring-2 focus:ring-black">
-            <img src="/google.svg" className="w-6 h-6" />
-            Continue with Google
-          </button>
+          <div className="flex justify-center mb-6">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                toast.error("Google registration failed");
+              }}
+              size="large"
+              width="400"
+              text="signup_with"
+              shape="rectangular"
+            />
+          </div>
 
           {/* OR Divider */}
           <div className="flex items-center gap-3 my-6">
@@ -99,6 +139,26 @@ function Login() {
           </div>
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 ">
+            <div className="flex gap-2 mb-2 font-medium">
+              <label className="block text-sm  text-gray-700 mb-2">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              {errors.fullName && (
+                <p className="text-red-500 text-sm">
+                  {errors.fullName}
+                </p>
+              )}
+            </div>
+
+            <input
+              type="text"
+              name="fullName"
+              value={user.fullName}
+              onChange={handleChange}
+              placeholder="Jhon dye"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 
+              focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+            />
 
             <div className="flex gap-2 mb-2 font-medium">
               <label className="block text-sm text-gray-700 mb-2">
@@ -149,26 +209,25 @@ function Login() {
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
-              <Link to="/forgot" className="text-blue-500 font-medium">Forgot Password</Link>
-            </div>
 
+            </div>
 
             <button
               type="submit"
               className="w-full rounded-lg bg-black py-3 font-medium text-white hover:bg-gray-900 transition"
             >
-              Sign in to your account
+              Create Account
             </button>
           </form>
 
           {/* Login Link */}
           <p className="mt-6 text-center text-sm text-gray-600">
-            New Here?{" "}
+            Already have an account?{" "}
             <Link
-              to="/register"
+              to="/login"
               className="font-medium text-black hover:underline"
             >
-              Sign up
+              Sign In
             </Link>
           </p>
 
@@ -178,4 +237,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

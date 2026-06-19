@@ -14,7 +14,7 @@ export const forgotPassword = (email) => {
     })
 }
 
-export const resetPassword = (password, token)=>{
+export const resetPassword = (password, token) => {
     return api.post(`users/reset-password?token=${token}`,
         {
             newPassword: password
@@ -22,3 +22,14 @@ export const resetPassword = (password, token)=>{
     )
 };
 
+export const verifyEmail = (token) => {
+    return api.get(`/users/verify-email?token=${token}`);
+}
+
+export const resendEmail = (email) => {
+    return api.post("/users/resend-verification", { email });
+};
+
+export const googleLogin =(token)=>{
+    return api.post("/users/google-login",{token});
+}

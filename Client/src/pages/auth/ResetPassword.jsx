@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/layout/Navbar";
+import Navbar from "../../components/layout/Navbar";
 import toast from "react-hot-toast";
-import { resetPassword } from "../services/authService";
+import { resetPassword } from "../../services/authService";
 
 function ResetPassword() {
     const [searchParams] = useSearchParams();
@@ -95,7 +95,6 @@ function ResetPassword() {
 
                     <button
                         type="submit"
-                        disabled={loading}
                         className="w-full p-2 text-white rounded bg-green-600 hover:bg-green-700"
                     >
                         Submit

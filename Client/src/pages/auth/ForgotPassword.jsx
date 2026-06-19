@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Navbar from "../components/layout/Navbar";
+import Navbar from "../../components/layout/Navbar";
 import toast from "react-hot-toast";
-import { forgotPassword } from "../services/authService"
+import { forgotPassword } from "../../services/authService"
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
@@ -68,7 +68,6 @@ function ForgotPassword() {
 
                     <button
                         type="submit"
-                        disabled={loading}
                         className="w-full p-2 text-white rounded bg-blue-600 hover:bg-blue-700">
                         Submit
                     </button>
