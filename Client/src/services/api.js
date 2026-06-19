@@ -26,21 +26,49 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
-        const status = error.response?.status;
-        const url = error.config?.url;
+    async (error) => {
+        const originalRequest = error.config;
 
-        if (url?.includes("/login")) {
-            return Promise.reject(error);
-        }
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !originalRequest.url?.includes("/login") &&
+            !originalRequest.url?.includes("/refresh-token")
+        ) {
+            originalRequest._retry = true;
 
-        if (status === 401) {
-            console.log("Unauthorized, logging out...");
+            try {
+                const refreshToken =
+                    localStorage.getItem("refreshToken");
 
-            localStorage.removeItem("token");
-            localStorage.removeItem("refreshToken");
+                const res = await axios.post(
+                    "http://localhost:5000/api/users/refresh-token",
+                    { refreshToken }
+                );
 
-            window.location.href = "/login";
+                const {
+                    token,
+                    refreshToken: newRefreshToken,
+                } = res.data.data;
+
+                localStorage.setItem("token", token);
+                localStorage.setItem(
+                    "refreshToken",
+                    newRefreshToken
+                );
+
+                originalRequest.headers.Authorization =
+                    `Bearer ${token}`;
+
+                return api(originalRequest);
+            } catch (err) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+
+                window.location.href = "/login";
+
+                return Promise.reject(err);
+            }
         }
 
         return Promise.reject(error);

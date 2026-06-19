@@ -30,6 +30,12 @@ export const resendEmail = (email) => {
     return api.post("/users/resend-verification", { email });
 };
 
-export const googleLogin =(token)=>{
-    return api.post("/users/google-login",{token});
+export const googleLogin = (token) => {
+    return api.post("/users/google-login", { token });
 }
+
+export const refreshAccessToken = (refreshToken) => {
+    return api.post("/users/refresh-token", {
+        refreshToken,
+    });
+};
