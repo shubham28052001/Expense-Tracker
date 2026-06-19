@@ -1,6 +1,5 @@
 import axios from "axios"
 
-// Axios Instance (IMPORTANT - central setup)
 const api = axios.create({
     baseURL: "http://localhost:5000/api",
     headers: {
@@ -8,13 +7,11 @@ const api = axios.create({
     }
 })
 
-// 🔥 3. Request Interceptor (Token attach karega)
-
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("token");
 
-        if (!token) {
+        if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;

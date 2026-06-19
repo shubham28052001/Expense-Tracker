@@ -506,4 +506,28 @@ const logoutAll = async (req, res) => {
     }
 }
 
-export default { registerUser, loginUser, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, refreshToken, logout, logoutAll, googleLogin };
+const getProfile = async (req, res) => {
+    try {
+        const user = await userModel
+            .findById(req.user.id)
+            .select("-password -refreshTokens");
+
+        if (!user) {
+            return NotFound(res, "User not found");
+        }
+
+        return Success(
+            res,
+            "Profile fetched successfully",
+            user
+        );
+    } catch (error) {
+        return ServerError(
+            res,
+            "Error fetching profile",
+            error.message
+        );
+    }
+};
+
+export default { registerUser, loginUser, verifyEmail, resendVerificationEmail, forgotPassword, resetPassword, refreshToken, logout, logoutAll, googleLogin,getProfile };

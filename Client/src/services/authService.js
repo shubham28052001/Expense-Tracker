@@ -39,3 +39,7 @@ export const refreshAccessToken = (refreshToken) => {
         refreshToken,
     });
 };
+
+export const getProfile = () => {
+    return api.get("/users/profile");
+};
