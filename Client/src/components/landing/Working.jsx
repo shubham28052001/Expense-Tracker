@@ -33,11 +33,11 @@ function Working() {
                 <div className="text-center mb-16"
                     data-aos="fade-up"
                 >
-                    <h2 className="text-4xl font-bold text-gray-900">
+                    <h2 className="text-6xl font-bold text-gray-900 dark:text-blue-100">
                         How It Works
                     </h2>
 
-                    <p className="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">
+                    <p className="mt-4 text-gray-600 max-w-2xl mx-auto text-lg dark:text-gray-200">
                         Start managing your money in just 4 simple steps with AI-powered intelligence.
                     </p>
                 </div>
@@ -50,7 +50,7 @@ function Working() {
                                 key={index}
                                 data-aos="zoom-in-up"
                                 data-aos-delay={index * 150}
-                                className="relative rounded-2xl border border-gray-100 bg-gray-50 p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+                                className="relative rounded-2xl border border-gray-100 bg-gray-50 dark:bg-gray-800 p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
                             >
                                 {/* Step number */}
                                 <span className="absolute -top-4 left-6 rounded-full bg-indigo-600 px-3 py-1 text-xs font-bold text-white">
@@ -58,14 +58,14 @@ function Working() {
                                 </span>
 
                                 {/* Icon */}
-                                <div className="text-indigo-600">{step.icon}</div>
+                                <div className="text-indigo-600 dark:text-indigo-200">{step.icon}</div>
 
                                 {/* Content */}
-                                <h3 className="mt-5 text-xl font-semibold text-gray-900">
+                                <h3 className="mt-5 text-xl font-semibold dark:text-blue-100 text-gray-900">
                                     {step.title}
                                 </h3>
 
-                                <p className="mt-3 text-gray-600">{step.desc}</p>
+                                <p className="mt-3 text-gray-600 dark:text-gray-200">{step.desc}</p>
 
                                 {/* Arrow (only show if not last item) */}
                                 {index !== steps.length - 1 && (

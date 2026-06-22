@@ -5,6 +5,7 @@ import { loginUser, googleLogin } from "../../services/authService"
 import { toast } from "react-hot-toast"
 import { GoogleLogin } from "@react-oauth/google";
 import { AuthContexts } from "../../context/AuthProvider";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 function Login() {
   const { login } = useContext(AuthContexts);
   const [user, setUser] = useState({
@@ -85,7 +86,7 @@ function Login() {
     }
   };
   return (
-    <div className=" bg-white flex flex-col lg:flex-row overflow-hidden h-screen">
+    <div className=" bg-white dark:bg-gray-900 flex flex-col lg:flex-row overflow-hidden h-screen">
 
       {loading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
@@ -95,7 +96,7 @@ function Login() {
         </div>
       )}
       {/* Left Side */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-slate-100 p-10">
+      <div className="hidden lg:flex lg:w-1/2 items-center dark:brightness-100 dark:contrast-100 justify-center p-10">
         <img
           src="/image2.avif"
           alt="Register"
@@ -108,10 +109,10 @@ function Login() {
         <div className="w-full max-w-md">
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-blue-100">
               Login Account
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-gray-600 dark:text-gray-300">
               Join us today and start managing your work efficiently.
             </p>
           </div>
@@ -134,14 +135,14 @@ function Login() {
           {/* OR Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="h-px bg-gray-300 flex-1"></div>
-            <span className="text-sm text-gray-500">OR</span>
+            <span className="text-sm text-gray-500 dark:text-blue-50">OR</span>
             <div className="h-px bg-gray-300 flex-1"></div>
           </div>
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 ">
 
             <div className="flex gap-2 mb-2 font-medium">
-              <label className="block text-sm text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2 dark:text-blue-100">
                 Email <span className="text-red-500">*</span>
               </label>
               {errors.email && (
@@ -157,12 +158,14 @@ function Login() {
               onChange={handleChange}
               placeholder="example@gmail.com"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 
-              focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+              focus:outline-none focus:ring-2 focus:ring-black focus:border-black
+               dark:focus:ring-white dark:focus:border-white placeholder:text-gray-400
+               dark:placeholder:text-gray-300 text-black dark:text-white"
             />
 
 
             <div className="flex gap-2 mb-2 font-medium">
-              <label className="block text-sm text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2 dark:text-blue-100">
                 Password <span className="text-red-500">*</span>
               </label>
               {errors.password && (
@@ -179,15 +182,21 @@ function Login() {
                 value={user.password}
                 onChange={handleChange}
                 placeholder="*********"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 
-              focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                className="w-full rounded-lg border text-black dark:text-white border-gray-300 px-4 py-3 
+              focus:outline-none focus:ring-2 focus:ring-black placeholder:text-gray-400
+               dark:placeholder:text-gray-300 focus:border-black dark:focus:ring-white 
+               dark:focus:border-white"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-3 text-gray-500"
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? (
+                  <FiEyeOff size={20} className="dark:text-white" />
+                ) : (
+                  <FiEye size={20} className="dark:text-white" />
+                )}
               </button>
               <Link to="/forgot" className="text-blue-500 font-medium">Forgot Password</Link>
             </div>
@@ -195,7 +204,7 @@ function Login() {
 
             <button
               type="submit"
-              className="w-full rounded-lg bg-black py-3 font-medium text-white hover:bg-gray-900 transition"
+              className="w-full rounded-lg bg-black py-3 font-medium dark:bg-blue-800 dark:hover:bg-blue-600 text-white hover:bg-gray-900 transition"
             >
               Sign in to your account
             </button>
@@ -206,7 +215,7 @@ function Login() {
             New Here?{" "}
             <Link
               to="/register"
-              className="font-medium text-black hover:underline"
+              className="font-medium text-black hover:underline dark:text-white"
             >
               Sign up
             </Link>

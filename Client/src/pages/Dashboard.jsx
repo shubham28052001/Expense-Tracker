@@ -1,26 +1,17 @@
-import { useEffect, useState } from "react";
-import { getProfile } from "../services/authService";
+import { useContext } from "react";
+import { AuthContexts } from "../context/AuthProvider";
+import Sidebar from "../components/Dashbaordlayout/Sidebar";
+import { Outlet } from "react-router-dom";
 
 function Dashboard() {
-    const [user, setUser] = useState(null);
-
-    useEffect(() => {
-        fetchProfile();
-    }, []);
-
-    const fetchProfile = async () => {
-        try {
-            const res = await getProfile();
-            setUser(res.data.data);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    const { user } = useContext(AuthContexts);
 
     return (
-        <div>
-            <h1>{user?.fullName}</h1>
-            <p>{user?.email}</p>
+        <div className="flex min-h-screen dark:bg-gray-900 transition-colors">
+            <Sidebar />
+            <main className="flex-1 p-6">
+                <Outlet />
+            </main>
         </div>
     );
 }

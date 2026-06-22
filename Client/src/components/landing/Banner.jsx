@@ -2,7 +2,7 @@ import React from 'react'
 
 function Banner() {
     return (
-        <div className="mx-auto max-w-[90%] pb-10 -mt-16"
+        <div className="mx-auto max-w-[90%] pb-10 -mt-16 dark:brightness-100 dark:contrast-200"
         data-aos="zoom-in"
         >
             <div className="overflow-hidden rounded-3xl shadow-xl">

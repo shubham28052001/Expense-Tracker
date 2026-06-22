@@ -49,11 +49,11 @@ function Features() {
         <div className="text-center mb-12"
           data-aos="fade-up"
         >
-          <h2 className="text-4xl font-bold text-gray-900">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-blue-50">
             Everything you need to manage your finances
           </h2>
 
-          <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-4 text-lg text-gray-600 max-w-3xl dark:text-gray-300 mx-auto">
             Track expenses, analyze spending patterns with AI,
             create budgets, and make smarter financial decisions
             from a single dashboard.
@@ -66,17 +66,17 @@ function Features() {
               key={index}
               data-aos="zoom-in-up"
               data-aos-delay={index * 100}
-              className="group rounded-2xl border border-gray-200 p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-indigo-500 hover:shadow-xl"
+              className="group rounded-2xl border border-gray-200 p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-indigo-500 dark:hover:border-amber-300 hover:shadow-xl"
             >
-              <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
+              <div className="inline-flex h-14 w-14 items-center dark:text-gray-900 justify-center rounded-xl bg-indigo-100 text-indigo-600">
                 {feature.icon}
               </div>
 
-              <h3 className="mt-5 text-xl font-semibold text-gray-900">
+              <h3 className="mt-5 text-xl font-semibold text-gray-900 dark:text-blue-100">
                 {feature.title}
               </h3>
 
-              <p className="mt-3 text-gray-600">
+              <p className="mt-3 text-gray-600 dark:text-gray-200">
                 {feature.desc}
               </p>
             </div>

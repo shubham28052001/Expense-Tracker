@@ -24,15 +24,15 @@ function Testimonials() {
   ];
 
   return (
-    <section id="testimonials" className="py-8">
+    <section id="testimonials" className="py-6">
       <div className="max-w-7xl mx-auto px-1">
 
         <div className="text-center mb-14" data-aos="fade-up">
-          <h2 className="text-4xl font-bold text-gray-900">
+          <h2 className="text-5xl font-bold text-gray-900 dark:text-blue-100">
             What Our Users Say
           </h2>
 
-          <p className="mt-2 -mb-6 text-gray-600">
+          <p className="mt-2 -mb-6 text-gray-600 dark:text-gray-200">
             Thousands of users trust our platform to manage their finances smarter.
           </p>
         </div>
@@ -43,7 +43,7 @@ function Testimonials() {
               key={index}
               data-aos="zoom-in-up"
               data-aos-delay={index * 150}
-              className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300"
+              className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300"
             >
               <div className="flex gap-1 text-yellow-500 mb-4">
                 {[...Array(5)].map((_, i) => (
@@ -51,16 +51,16 @@ function Testimonials() {
                 ))}
               </div>
 
-              <p className="text-gray-600 italic">
+              <p className="text-gray-600 italic dark:text-blue-100">
                 "{user.review}"
               </p>
 
               <div className="mt-6">
-                <h4 className="font-semibold text-gray-900">
+                <h4 className="font-semibold text-gray-900 dark:text-blue-100">
                   {user.name}
                 </h4>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-300">
                   {user.role}
                 </p>
               </div>

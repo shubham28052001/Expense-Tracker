@@ -3,6 +3,7 @@ import axios from "axios";
 import Navbar from "../../components/layout/Navbar";
 import toast from "react-hot-toast";
 import { forgotPassword } from "../../services/authService"
+import { Link } from "react-router";
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
@@ -34,9 +35,7 @@ function ForgotPassword() {
     };
 
     return (
-        <div>
-            <Navbar />
-
+        <div className="min-h-screen bg-white dark:bg-gray-900">
             {loading && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="flex flex-col items-center gap-3">
@@ -45,12 +44,12 @@ function ForgotPassword() {
                 </div>
             )}
 
-            <div className="flex justify-center items-center h-96 bg-gray-50">
+            <div className="flex justify-center items-center h-96">
                 <form
                     onSubmit={handleSubmit}
-                    className="w-96 p-6 bg-white shadow-md rounded space-y-4"
+                    className="w-96 p-6 bg-white  dark:bg-gray-800 dark:border-gray-700 border border-gray-200 shadow-md rounded space-y-4"
                 >
-                    <h2 className="text-2xl font-bold text-center">
+                    <h2 className="text-2xl font-bold text-center dark:text-blue-100">
                         Forgot Password
                     </h2>
 
@@ -61,7 +60,9 @@ function ForgotPassword() {
                     <input
                         type="email"
                         placeholder="Enter your email"
-                        className="w-full border p-2 rounded"
+                        className=" w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700
+                      text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-300 px-4 py-3 focus:outline-none
+                        focus:ring-2 focus:ring-indigo-500"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
@@ -71,6 +72,15 @@ function ForgotPassword() {
                         className="w-full p-2 text-white rounded bg-blue-600 hover:bg-blue-700">
                         Submit
                     </button>
+                    <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+                        Remember your password?{" "}
+                        <Link
+                            to="/login"
+                            className="font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                        >
+                            Sign In
+                        </Link>
+                    </p>
                 </form>
             </div>
         </div>

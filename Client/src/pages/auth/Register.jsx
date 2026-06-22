@@ -5,6 +5,7 @@ import { validateRegister } from "../../utils/validation";
 import { toast } from "react-hot-toast"
 import { useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 function Register() {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ function Register() {
   };
 
   return (
-    <div className=" bg-white flex flex-col lg:flex-row overflow-hidden h-screen">
+    <div className=" bg-white dark:bg-gray-900 flex flex-col lg:flex-row overflow-hidden h-screen">
 
       {loading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
@@ -98,7 +99,7 @@ function Register() {
       )}
 
       {/* Left Side */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-slate-100 p-10">
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center dark:brightness-100 dark:contrast-100 p-10">
         <img
           src="/image1.jpg"
           alt="Register Illustration"
@@ -111,10 +112,10 @@ function Register() {
         <div className="w-full max-w-md">
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold dark:text-blue-100 text-gray-900">
               Create Account
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               Join us today and start managing your work efficiently.
             </p>
           </div>
@@ -134,13 +135,13 @@ function Register() {
           {/* OR Divider */}
           <div className="flex items-center gap-3 my-6">
             <div className="h-px bg-gray-300 flex-1"></div>
-            <span className="text-sm text-gray-500">OR</span>
+            <span className="text-sm text-gray-500 dark:text-blue-50">OR</span>
             <div className="h-px bg-gray-300 flex-1"></div>
           </div>
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 ">
             <div className="flex gap-2 mb-2 font-medium">
-              <label className="block text-sm  text-gray-700 mb-2">
+              <label className="block text-sm  text-gray-700 mb-2 dark:text-blue-100">
                 Full Name <span className="text-red-500">*</span>
               </label>
               {errors.fullName && (
@@ -157,11 +158,13 @@ function Register() {
               onChange={handleChange}
               placeholder="Jhon dye"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 
-              focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+              focus:outline-none focus:ring-2 focus:ring-black focus:border-black
+               dark:focus:ring-white dark:focus:border-white placeholder:text-gray-400
+               dark:placeholder:text-gray-300 text-black dark:text-white"
             />
 
             <div className="flex gap-2 mb-2 font-medium">
-              <label className="block text-sm text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2 dark:text-blue-100">
                 Email <span className="text-red-500">*</span>
               </label>
               {errors.email && (
@@ -177,12 +180,14 @@ function Register() {
               onChange={handleChange}
               placeholder="example@gmail.com"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 
-              focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+              focus:outline-none focus:ring-2 focus:ring-black focus:border-black
+               dark:focus:ring-white dark:focus:border-white placeholder:text-gray-400
+               dark:placeholder:text-gray-300 text-black dark:text-white"
             />
 
 
             <div className="flex gap-2 mb-2 font-medium">
-              <label className="block text-sm text-gray-700 mb-2">
+              <label className="block text-sm text-gray-700 mb-2 dark:text-blue-100">
                 Password <span className="text-red-500">*</span>
               </label>
               {errors.password && (
@@ -200,21 +205,27 @@ function Register() {
                 onChange={handleChange}
                 placeholder="*********"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 
-              focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+              focus:outline-none focus:ring-2 focus:ring-black focus:border-black
+               dark:focus:ring-white dark:focus:border-white placeholder:text-gray-400
+               dark:placeholder:text-gray-300 text-black dark:text-white"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-3 text-gray-500"
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? (
+                  <FiEyeOff size={20} className="dark:text-white" />
+                ) : (
+                  <FiEye size={20} className="dark:text-white" />
+                )}
               </button>
 
             </div>
 
             <button
               type="submit"
-              className="w-full rounded-lg bg-black py-3 font-medium text-white hover:bg-gray-900 transition"
+              className="w-full rounded-lg bg-black py-3 dark:bg-gray-100 dark:text-black dark:hover:bg-gray-300 font-medium text-white hover:bg-gray-900 transition"
             >
               Create Account
             </button>
@@ -225,7 +236,7 @@ function Register() {
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-medium text-black hover:underline"
+              className="font-medium text-black hover:underline dark:text-white"
             >
               Sign In
             </Link>

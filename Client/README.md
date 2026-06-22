@@ -29,7 +29,15 @@ A modern React application built with Vite for managing personal expenses with u
 Client/
 ├── src/
 │   ├── components/
-│   │   ├── common/          # Reusable components
+│   │   ├── Dashbaordlayout/     # Dashboard layout components
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── Expense.jsx
+│   │   │   ├── Budgets.jsx
+│   │   │   ├── Analytics.jsx
+│   │   │   ├── AIInsights.jsx
+│   │   │   ├── Profile.jsx
+│   │   │   └── Settings.jsx
 │   │   ├── landing/         # Landing page components
 │   │   │   ├── Banner.jsx
 │   │   │   ├── CTA.jsx
@@ -155,6 +163,17 @@ The frontend communicates with the backend API through:
 - **Landing**: Marketing landing page with features and testimonials
 - **Dashboard**: Main user dashboard for expense management
 - **Authentication**: Register, login, password reset, email verification flows
+
+### Dashboard Components
+The dashboard includes comprehensive expense management features:
+- **Home**: Dashboard overview and quick stats
+- **Expense**: Add, view, edit, and delete expense entries
+- **Budgets**: Create and manage budget limits for different categories
+- **Analytics**: Visual charts and graphs for expense analysis
+- **AIInsights**: AI-powered recommendations and spending insights
+- **Profile**: User profile management and account settings
+- **Settings**: Application preferences and configuration
+- **Sidebar**: Navigation and quick access to all features
 
 ### Protected Routes
 Routes are protected using context-based authentication:
