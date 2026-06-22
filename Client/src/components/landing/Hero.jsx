@@ -1,61 +1,91 @@
-import React from 'react'
-import { Link } from "react-router-dom"
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import Banner from "./Banner";
+import Stats from "./Stats";
+import { Feather } from "lucide-react";
+import Features from "./Features";
+import Working from "./Working";
+import Testimonials from "./Testimonials";
+import CTA from "./CTA";
+import {AuthContexts} from "../../context/AuthProvider";
 
 function Hero() {
-
-  const token = localStorage.getItem("token");
+  const {token} = useContext(AuthContexts);
 
   return (
     <div>
-      <section className="bg-white">
-        <div className="mx-auto w-screen max-w-7xl px-3 mt-6 sm:mt-0 py-2 sm:px-6 sm:py-24 md:grid md:grid-cols-2 md:items-center md:gap-4 lg:px-2 lg:py-12">
+      <section className="bg-gradient-to-b from-indigo-100 via-blue-50 to-white">
+        <div className="mx-auto max-w-7xl px-6 py-16 md:grid md:grid-cols-2 md:items-center md:gap-28 lg:py-20">
 
-          <div className="text-left">
-            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">
-              Take control of your money and
-              <strong className="text-indigo-600"> grow your </strong>
-              savings
+          <div data-aos="fade-right">
+            <span className="inline-block rounded-full bg-indigo-100 px-4 py-1 text-sm font-medium text-indigo-700">
+              AI Expense Tracking
+            </span>
+
+            <h1
+              data-aos="fade-right"
+              data-aos-delay="100"
+              className="mt-5 max-w-2xl font-bold text-indigo-600 text-5xl sm:text-9xl lg:max-w-4xl lg:text-5xl"
+            >
+              Manage Your Finance with Intelligence
             </h1>
 
-            <p className="mt-4 text-base text-pretty text-gray-700 sm:text-lg/relaxed">
-              Track your daily expenses effortlessly, set smart budgets,
-              and get clear insights into your spending habits. Achieve
-              your financial goals faster with our easy-to-use expense tracker.
+            <p data-aos="fade-right"
+              data-aos-delay="400" className="mt-6 max-w-5xl text-center text-gray-600 text-lg leading-relaxed">
+              Track your daily expenses effortlessly, set smart budgets, and gain powerful AI-driven insights
+              into your spending habits.Analyze where your money goes, identify saving opportunities, and make
+              smarter financial decisions with personalized recommendations.
             </p>
 
-            <div className="mt-4 flex justify-center gap-4 sm:mt-6">
-
+            <div data-aos="fade-up"
+              data-aos-delay="600"
+              className="mt-8 flex flex-wrap gap-4">
               {token ? (
                 <Link
                   to="/dashboard"
-                  className="inline-block rounded border border-indigo-600 bg-indigo-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+                  className="rounded-lg bg-indigo-600 px-6 py-3 font-medium text-white shadow-lg transition hover:bg-indigo-700 hover:scale-105"
                 >
-                  Explore free Services
+                  Go to Dashboard
                 </Link>
               ) : (
-                <Link
-                  to="/register"
-                  className="inline-block rounded border border-indigo-600 bg-indigo-600 px-5 py-3 font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
-                >
-                  Start Tracking for Free
-                </Link>
-              )}
+                <>
+                  <Link
+                    to="/register"
+                    className="rounded-lg bg-indigo-600 px-6 py-3 font-medium text-white shadow-lg transition hover:bg-indigo-700 hover:scale-105"
+                  >
+                    Start Tracking Free
+                  </Link>
 
+                  <Link
+                    to="/login"
+                    className="rounded-lg border border-indigo-600 px-6 py-3 font-medium text-indigo-600 transition hover:bg-indigo-50"
+                  >
+                    Login
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
-          <div className='mt-2'>
-              <img
+          <div data-aos="zoom-in-left"
+            data-aos-delay="300" className="mt-10 md:mt-0">
+            <img
               src="/Landing.svg"
-              alt="Landing"
+              alt="Expense Tracker"
+              className="w-full transition duration-500 hover:scale-105"
             />
           </div>
-
-          
         </div>
       </section>
+
+      <Banner />
+      <Stats />
+      <Features />
+      <Working />
+      <Testimonials />
+      <CTA />
     </div>
-  )
+  );
 }
 
 export default Hero;

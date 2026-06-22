@@ -1,10 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { validateLogin } from "../../utils/validation";
 import { loginUser, googleLogin } from "../../services/authService"
 import { toast } from "react-hot-toast"
 import { GoogleLogin } from "@react-oauth/google";
+import { AuthContexts } from "../../context/AuthProvider";
 function Login() {
+  const { login } = useContext(AuthContexts);
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -37,7 +39,7 @@ function Login() {
       const res = await loginUser(user);
 
       const data = res.data.data;
-      localStorage.setItem("token", data.token);
+      login(data.token);
       localStorage.setItem("refreshToken", data.refreshToken);
 
       toast.success(res.data.message);
@@ -48,7 +50,7 @@ function Login() {
 
     } catch (error) {
       console.log(error);
-      
+
       toast.error(
         error?.response?.data?.message || "Server error"
       );
@@ -63,10 +65,7 @@ function Login() {
         credentialResponse.credential
       );
 
-      localStorage.setItem(
-        "token",
-        res.data.accessToken
-      );
+      login(res.data.accessToken);
 
       localStorage.setItem(
         "refreshToken",

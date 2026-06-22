@@ -1,13 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from "react-router-dom";
+import { AuthContexts } from '../../context/AuthProvider';
 function Navbar() {
 
-    const token = localStorage.getItem("token");
+    const { token, logout } = useContext(AuthContexts);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-
+        logout();
         window.location.href = "/";
     };
 
@@ -23,6 +22,20 @@ function Navbar() {
                     />
                 </Link>
 
+                <div className="hidden md:flex items-center w-sm justify-between">
+                    <a href="#features" className="text-gray-600 hover:text-indigo-600">
+                        Features
+                    </a>
+
+                    <a href="#working" className="text-gray-600 hover:text-indigo-600">
+                        How It Works
+                    </a>
+
+                    <a href="#testimonials" className="text-gray-600 hover:text-indigo-600">
+                        Testimonials
+                    </a>
+                </div>
+
                 <div className="flex items-center gap-3">
 
                     {token ? (
@@ -31,7 +44,7 @@ function Navbar() {
                                 to="/dashboard"
                                 className="px-7 sm:px-5 sm:py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
                             >
-                               Go to Dashboard
+                                Go to Dashboard
                             </Link>
 
                             <button
