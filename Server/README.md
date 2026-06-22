@@ -92,6 +92,8 @@ Base URL: `http://localhost:5000/api/users`
 | POST | /refresh-token | Generate a new access token using a refresh token |
 | POST | /logout | Revoke one refresh token |
 | POST | /logoutAll | Revoke all refresh tokens for the logged-in user |
+| GET | /profile | Get user profile (requires authentication) |
+| POST | /chat | Chat with AI using Gemini API |
 
 ## Example Requests
 
@@ -136,6 +138,38 @@ curl -X POST http://localhost:5000/api/users/refresh-token \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "YOUR_REFRESH_TOKEN"
+  }'
+```
+
+### Logout
+```bash
+curl -X POST http://localhost:5000/api/users/logout \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "refreshToken": "YOUR_REFRESH_TOKEN"
+  }'
+```
+
+### Logout All Devices
+```bash
+curl -X POST http://localhost:5000/api/users/logoutAll \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Get Profile
+```bash
+curl -X GET http://localhost:5000/api/users/profile \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Chat with AI
+```bash
+curl -X POST http://localhost:5000/api/users/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Your query to AI"
   }'
 ```
 
