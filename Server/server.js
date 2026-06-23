@@ -5,6 +5,8 @@ import http from "http";
 import connectDB from "./config/db.js";
 import userRoute from "./Route/userRoute.js";
 import accountRoute from "./Route/accountRoute.js"
+import transactionRoute from "./Route/transactionRoute.js"
+import budgetRoute from "./Route/budgetRoute.js"
 import cors from "cors"
 //using dotenv to load environment variables from .env file
 connectDB();
@@ -20,7 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoute);
-app.use("/api/account",accountRoute)
+app.use("/api/account",accountRoute);
+app.use("/api/transaction",transactionRoute);
+app.use("/api/budget",budgetRoute);
 app.get("/",(req,res)=>{
     res.send("Express + HTTP Server is running perfectly!")
 });
