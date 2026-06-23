@@ -1,6 +1,6 @@
 # Expense Tracker Backend API
 
-This backend powers the Expense Tracker application with user authentication, email verification, password reset, JWT refresh handling, and rate-limited auth endpoints.
+This backend powers the Expense Tracker application with user authentication, email verification, password reset, JWT refresh handling, rate-limited auth endpoints, and account management.
 
 ## Features
 
@@ -11,6 +11,7 @@ This backend powers the Expense Tracker application with user authentication, em
 - JWT access token + refresh token support
 - Login history tracking and refresh-token storage
 - Rate limiting for sensitive auth endpoints
+- Account creation, listing, update, delete, and active-account switching
 
 ## Tech Stack
 
@@ -31,12 +32,17 @@ Server/
 │   ├── db.js
 │   └── mail.js
 ├── Controller/
+│   ├── GeminiController.js
+│   ├── accountController.js
 │   └── userController.js
 ├── middleware/
+│   ├── authmiddlware.js
 │   └── rateLimitMiddlware.js
 ├── modal/
+│   ├── AccountModel.js
 │   └── user.js
 ├── Route/
+│   ├── accountRoute.js
 │   └── userRoute.js
 ├── utills/
 │   ├── bcrypt.js
@@ -78,6 +84,7 @@ Server/
 
 ## API Endpoints
 
+### User Authentication
 Base URL: `http://localhost:5000/api/users`
 
 | Method | Endpoint | Description |
@@ -88,12 +95,24 @@ Base URL: `http://localhost:5000/api/users`
 | GET | /verify-email?token=YOUR_TOKEN | Verify email address |
 | POST | /resend-verification | Send another verification email |
 | POST | /forgot-password | Request a password reset email |
-| POST | /reset-password?token=YOUR_RESET_TOKEN | Reset password using a reset token |
+| POST | /reset-password | Reset password using a reset token |
 | POST | /refresh-token | Generate a new access token using a refresh token |
 | POST | /logout | Revoke one refresh token |
 | POST | /logoutAll | Revoke all refresh tokens for the logged-in user |
 | GET | /profile | Get user profile (requires authentication) |
 | POST | /chat | Chat with AI using Gemini API |
+
+### Account Management
+Base URL: `http://localhost:5000/api/account`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /create | Create a new account |
+| GET | /getAllaccount | Get all accounts for the logged-in user |
+| GET | /getaccount/:id | Get one account by id |
+| PUT | /updateAccount/:id | Update an account's name or type |
+| DELETE | /deleteAccount/:id | Soft-delete an account |
+| PATCH | /toggle/:id | Switch the active account |
 
 ## Example Requests
 
@@ -173,11 +192,58 @@ curl -X POST http://localhost:5000/api/users/chat \
   }'
 ```
 
+### Create Account
+```bash
+curl -X POST http://localhost:5000/api/account/create \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "name": "Main Wallet",
+    "type": "CURRENT",
+    "initialBalance": 1000
+  }'
+```
+
+### List Accounts
+```bash
+curl -X GET http://localhost:5000/api/account/getAllaccount \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Get Account by ID
+```bash
+curl -X GET http://localhost:5000/api/account/getaccount/YOUR_ACCOUNT_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Update Account
+```bash
+curl -X PUT http://localhost:5000/api/account/updateAccount/YOUR_ACCOUNT_ID \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "name": "Savings",
+    "type": "SAVING"
+  }'
+```
+
+### Delete Account
+```bash
+curl -X DELETE http://localhost:5000/api/account/deleteAccount/YOUR_ACCOUNT_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### Switch Active Account
+```bash
+curl -X PATCH http://localhost:5000/api/account/toggle/YOUR_ACCOUNT_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
 ## Notes
 
 - Passwords are hashed before being stored.
 - Verification links are generated with JWT and expire after 10 minutes.
 - Refresh tokens are stored per device and can be revoked individually or all at once.
 - Rate limiting is applied to login, registration, password reset, and resend-email flows for protection.
-
+- Account deletion is soft-delete, and one active account must remain for each user.
 
