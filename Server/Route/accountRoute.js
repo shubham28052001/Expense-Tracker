@@ -2,6 +2,7 @@ import express from "express"
 import accountController from "../Controller/accountController.js"
 import authMiddleware from "../middleware/authmiddlware.js";
 
+
 const router = express.Router();
 
 router.post("/create",authMiddleware,accountController.createAccount);

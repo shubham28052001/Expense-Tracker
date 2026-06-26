@@ -15,4 +15,3 @@ router.get("/getRecent/:accountId",authmiddlware,transactionController.getRecent
 export default router;
 
 
-

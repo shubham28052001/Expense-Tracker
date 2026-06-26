@@ -112,7 +112,7 @@ const updateAccount = async (req, res) => {
         account.name = name.trim().toLowerCase();
         account.type = type;
         await account.save();
-
+        
         return Success(
             res,
             "Account updated successfully",
