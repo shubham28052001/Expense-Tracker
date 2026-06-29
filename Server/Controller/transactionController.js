@@ -277,7 +277,7 @@ const getRecentTransaction = async (req, res) => {
                 accountId,
                 isDeleted: false,
             })
-            .sort({ date: -1 })
+            .sort({ createdAt: -1 })
             .limit(5);
 
         return Success(

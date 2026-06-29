@@ -4,7 +4,7 @@ function AddAccount({setOpenModal}) {
     return (
         <div
             onClick={() => setOpenModal(true)}
-            className="bg-gray-100 dark:bg-gray-800 rounded-xl max-w-4xs shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition h-36"
+            className="bg-gray-100 dark:bg-gray-800 rounded-xl mt-3 max-w-4xs shadow-md flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition h-36"
         >
             <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-300 flex items-center justify-center mb-3">
                 <span className="text-xl font-bold text-blue-600">+</span>

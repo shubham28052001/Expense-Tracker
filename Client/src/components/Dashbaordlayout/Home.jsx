@@ -10,6 +10,12 @@ function Home() {
   const [accounts, setAccounts] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [editAccount, setEditAccount] = useState(null);
+  const [refresh, setRefresh] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
+
+  const handleRefresh = () => {
+    setRefresh(prev => !prev);
+  };
 
   const fetchAccounts = async () => {
     try {
@@ -22,7 +28,7 @@ function Home() {
 
   useEffect(() => {
     fetchAccounts();
-  }, []);
+  }, [refresh]);
 
   const handleToggle = async (id) => {
     try {
@@ -38,6 +44,11 @@ function Home() {
     }
   }
 
+  const onAccountChange = async (id) => {
+    await switchActiveAccount(id);
+    await fetchAccounts();
+  };
+
   const activeAccount = accounts.find(
     (account) => account.isActive
   );
@@ -45,7 +56,7 @@ function Home() {
   return (
 
     <div>
-      <Header activeAccount={activeAccount} />
+      <Header activeAccount={activeAccount} openForm={openForm} setOpenForm={setOpenForm} accounts={accounts} refresh={refresh} onAccountChange={onAccountChange} handleRefresh={handleRefresh} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         <AddAccount setOpenModal={setOpenModal} />

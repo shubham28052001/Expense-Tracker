@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createTransaction, getAllaccount } from "../../services/authService"
 import { toast } from "react-hot-toast"
-function AddTransactionForm() {
+function AddTransactionForm({onClose,onSuccess }) {
   const getToday = () => {
     return new Date().toISOString().split("T")[0];
   };
@@ -49,7 +49,10 @@ function AddTransactionForm() {
     try {
       let response = await createTransaction({ ...form, accountId });
       toast.success(response.data.message);
+      onSuccess();
+      onClose();
     } catch (error) {
+              console.log(error);
       toast.error(
         error?.response?.data?.message ||
         "Something went wrong"

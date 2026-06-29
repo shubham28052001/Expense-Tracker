@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import AddTransactionForm from "./AddTransactionForm";
 
-function AddTransactionModal({ open, onClose }) {
+function AddTransactionModal({ open, onClose,onSuccess  }) {
   if (!open) return null;
 
   return ReactDOM.createPortal(
@@ -18,7 +18,7 @@ function AddTransactionModal({ open, onClose }) {
           ✕
         </button>
 
-        <AddTransactionForm />
+        <AddTransactionForm onClose={onClose} onSuccess={onSuccess}/>
       </div>
 
     </div>,

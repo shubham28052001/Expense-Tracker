@@ -7,8 +7,8 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router"
 
 function AccountCard({ account, handleToggle, fetchAccounts, setEditAccount }) {
+      const [openMenu, setOpenMenu] = useState(false);
     const navigate = useNavigate();
-    const [openMenu, setOpenMenu] = useState(false);
 
     const handleDelete = async (id) => {
         try {
@@ -30,7 +30,7 @@ function AccountCard({ account, handleToggle, fetchAccounts, setEditAccount }) {
 
     return (
         <div onClick={() => accountInfo(account._id)}
-            className="bg-gray-100 dark:bg-gray-800 rounded-xl max-w-4xs h-36 shadow-md p-5 hover:shadow-lg transition"
+            className="bg-gray-100 dark:bg-gray-800 mt-3 rounded-xl max-w-4xs h-36 shadow-md p-5 hover:shadow-lg transition"
         >
             <div className="flex justify-between items-start">
                 <div className="w-full">
@@ -75,8 +75,8 @@ function AccountCard({ account, handleToggle, fetchAccounts, setEditAccount }) {
                         </div>
                     </div>
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold dark:text-gray-50 mb-4">
-                            ₹{account.initialBalance}
+                        <h1 className="text-2xl font-bold dark:text-gray-50 mb-4 flex items-center gap-1">
+                          <span className='text-[12px]'>Initial balance:</span> ₹{account.initialBalance}
                         </h1>
                         <button
                             onClick={(e) => {
