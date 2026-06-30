@@ -1,11 +1,14 @@
-import React from 'react'
+import React from "react";
+import BudgetHeader from "../Budget/BudgetHeader";
 
 function Budgets() {
   return (
-    <div>
-      Budget hai bhai hum
+    <div className="space-y-6">
+
+      <BudgetHeader />
+
     </div>
-  )
+  );
 }
 
-export default Budgets
+export default Budgets;

@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AddTransactionModal from "../Forms/AddTransactionModal";
+import { SummaryTransaction } from "../../services/authService";
 import ProgressBar from './ProgressBar';
-import RecentTransactions from './getRecentTransactions';
+import {toast} from 'react-hot-toast';
+import StatsCards from './StatsCards';
 
-function Header({ activeAccount, accounts, openForm, setOpenForm, refresh, handleRefresh, onAccountChange }) {
+function Header({ activeAccount, openForm, setOpenForm, refresh, handleRefresh }) {
+    const [summary, setSummary] = useState(null);
+
+    useEffect(() => {
+        if (!activeAccount?._id) return;
+
+        const fetchSummary = async () => {
+            try {
+                const res = await SummaryTransaction(activeAccount._id);
+                setSummary(res.data.data);
+            } catch (error) {
+                toast.error("Failed to load dashboard");
+            }
+        };
+
+        fetchSummary();
+    }, [activeAccount, refresh]);
+
     return (
         <div className="flex flex-col space-y-6 w-full">
             <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
                 <div>
-                    <h1 className="text-3xl md:text-4xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text font-extrabold text-transparent tracking-tight">
+                    <h1 className="text-3xl md:text-4xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text font-extrabold text-transparent tracking-tight">
                         Dashboard
                     </h1>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -32,20 +51,9 @@ function Header({ activeAccount, accounts, openForm, setOpenForm, refresh, handl
                     Add Transaction
                 </button>
             </div>
-            <ProgressBar activeAccount={activeAccount} refresh={refresh} />
-            <RecentTransactions
-                activeAccount={activeAccount}
-                accounts={accounts}
-                onAccountChange={onAccountChange}
-                refresh={refresh}
-            />
-
-            <AddTransactionModal
-                open={openForm}
-                onClose={() => setOpenForm(false)}
-                onSuccess={handleRefresh}
-            />
-
+            <StatsCards summary={summary} />
+            <ProgressBar summary={summary} />
+            <AddTransactionModal open={openForm} onClose={() => setOpenForm(false)} onSuccess={handleRefresh} />
         </div>
     );
 }

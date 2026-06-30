@@ -104,5 +104,41 @@ export const getRecent = (id) => {
 }
 
 
+//^Budgets
+
+
+export const createBudget = (data) => {
+    return api.post("/budget/create", data);
+};
+
+export const getAllBudgets = () => {
+    return api.get("/budget/getAllBudgets");
+};
+
+export const getBudget = (id) => {
+    return api.get(`/budget/getBudget/${id}`);
+};
+
+export const updateBudget = (id, data) => {
+    return api.put(`/budget/updateBudget/${id}`, data);
+};
+
+export const deleteBudget = (id) => {
+    return api.delete(`/budget/deleteBudget/${id}`);
+};
+
+export const getBudgetUsage = (id) => {
+    return api.get(`/budget/getBudgetUsage/${id}`);
+};
+
+export const getExpenseByCategory = (accountId) => {
+    return api.get(`/budget/expense-by-category/${accountId}`);
+};
+
+export const getMonthlyOverview = (accountId) => {
+    return api.get(`/budget/monthlyoverview/${accountId}`);
+};
+
+
 
 

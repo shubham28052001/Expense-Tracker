@@ -22,7 +22,7 @@ function RecentTransactions({ activeAccount, refresh, accounts, onAccountChange 
     }, [activeAccount, refresh]);
 
     return (
-        <div className="w-2/5 p-4 rounded-xl flex flex-col bg-gray-200 dark:bg-gray-600">
+        <div className="w-2/5 mt-4 p-4 rounded-xl flex flex-col bg-gray-200 dark:bg-gray-600">
             
             <div className="flex justify-between items-center pb-4 border-b border-gray-100 dark:border-gray-800 mb-4">
                 <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
@@ -59,8 +59,8 @@ function RecentTransactions({ activeAccount, refresh, accounts, onAccountChange 
                             {/* Left Side: Icon & Details */}
                             <div className="flex items-center gap-4">
                                 <div
-                                    className={`w-10 h-10 rounded-full flex flex-shrink-0 items-center justify-center text-lg shadow-sm ${
-                                        item.type === "INCOME"
+                                    className={`w-10 h-10 rounded-full flex shrink-0 items-center justify-center text-lg shadow-sm 
+                                        ${item.type === "INCOME"
                                             ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
                                             : "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400"
                                     }`}
@@ -73,7 +73,7 @@ function RecentTransactions({ activeAccount, refresh, accounts, onAccountChange 
                                         {item.category}
                                     </h3>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5">
-                                        <span className="truncate max-w-[120px] sm:max-w-[200px]">
+                                        <span className="truncate max-w-30 sm:max-w-50">
                                             {item.description || "No description"}
                                         </span>
                                         <span className="text-gray-300 dark:text-gray-600">•</span>

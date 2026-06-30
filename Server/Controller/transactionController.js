@@ -245,7 +245,9 @@ const getDashboardSummary = async (req, res) => {
                 totalExpense = item.total;
             }
         });
-        const currentBalance = account.initialBalance + totalIncome - totalExpense;
+        const budget = account.initialBalance + totalIncome;
+        const currentBalance = budget - totalExpense;
+        const usedPercent =budget > 0 ? Number(((totalExpense / budget) * 100).toFixed(2)) : 0;
 
         return Success(
             res,
@@ -256,6 +258,8 @@ const getDashboardSummary = async (req, res) => {
                 totalIncome,
                 totalExpense,
                 currentBalance,
+                budget,
+                usedPercent
             }
         );
 

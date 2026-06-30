@@ -8,9 +8,7 @@ function AddTransactionModal({ open, onClose,onSuccess  }) {
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-black/90 dark:bg-black/90 bg-opacity-50 flex items-center justify-center">
       
-      <div className="bg-white dark:bg-black/40 p-5 rounded-xl w-[400px] relative">
-        
-        {/* CLOSE BUTTON */}
+      <div className="bg-white dark:bg-black/40 p-5 rounded-xl w-100 relative">
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-2xl font-bold dark:text-gray-200 text-black"

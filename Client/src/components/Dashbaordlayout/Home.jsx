@@ -6,6 +6,7 @@ import AccountCard from "../HomePage/AccountCard";
 import CreateAccount from "../Forms/CreateAccount";
 import Header from "../HomePage/Header";
 import AddTransactionForm from "../Forms/AddTransactionForm";
+import RecentTransactions from "../HomePage/getRecentTransactions";
 function Home() {
   const [accounts, setAccounts] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -56,7 +57,9 @@ function Home() {
   return (
 
     <div>
-      <Header activeAccount={activeAccount} openForm={openForm} setOpenForm={setOpenForm} accounts={accounts} refresh={refresh} onAccountChange={onAccountChange} handleRefresh={handleRefresh} />
+      <Header activeAccount={activeAccount} openForm={openForm} setOpenForm={setOpenForm} refresh={refresh} handleRefresh={handleRefresh} />
+      <RecentTransactions activeAccount={activeAccount} accounts={accounts} onAccountChange={onAccountChange} refresh={refresh}/>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         <AddAccount setOpenModal={setOpenModal} />
